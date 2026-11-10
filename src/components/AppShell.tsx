@@ -36,7 +36,7 @@ export const AppShell = ({ children }: AppShellProps) => {
             Colony
           </p>
           <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-dust-400">
-            Resource ledger
+            Gear & resources
           </p>
         </div>
 

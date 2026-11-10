@@ -30,9 +30,14 @@ export const evaluateClaim = (
   dayStart: number,
   dayEnd: number,
   amount?: number,
+  onHandById?: Record<string, number>,
 ): ClaimEvaluation => {
-  const resource = RESOURCES.find((item) => item.id === resourceId);
-  if (!resource) return { verdict: "red", reason: "Unknown gear" };
+  const base = RESOURCES.find((item) => item.id === resourceId);
+  if (!base) return { verdict: "red", reason: "Unknown gear" };
+  const resource =
+    onHandById && onHandById[resourceId] !== undefined
+      ? { ...base, onHand: onHandById[resourceId] }
+      : base;
 
   const duration = dayEnd - dayStart + 1;
   let verdict: PolicyVerdict = "green";

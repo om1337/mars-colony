@@ -38,8 +38,8 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/", label: "Week board", roles: "all" },
       { href: "/my-day", label: "My day", roles: "all" },
-      { href: "/resource/rover-a", label: "Resource", roles: "all" },
-      { href: "/live-burn", label: "Live burn", roles: "all" },
+      { href: "/resource/rover-a", label: "Gear", roles: "all" },
+      { href: "/live-burn", label: "Live burn", roles: ["crew", "commander"] },
     ],
   },
   {
@@ -48,14 +48,14 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/mission/draft", label: "Draft", roles: ["commander"] },
       { href: "/mission/conflict", label: "Conflict", roles: ["commander"] },
-      { href: "/mission/blocked", label: "Blocked", roles: "all" },
+      { href: "/mission/blocked", label: "Blocked", roles: ["commander", "ops"] },
     ],
   },
   {
     id: "policy",
     label: "Policy",
     items: [
-      { href: "/policy", label: "Editor", roles: "all" },
+      { href: "/policy", label: "Editor", roles: ["ops"] },
       {
         href: "/exception/request",
         label: "Request",
@@ -78,7 +78,11 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Checkout",
         roles: ["crew", "commander", "supply"],
       },
-      { href: "/reconcile", label: "Return", roles: "all" },
+      {
+        href: "/reconcile",
+        label: "Return",
+        roles: ["crew", "commander", "supply"],
+      },
       {
         href: "/supply/exceptions",
         label: "Exceptions",
@@ -89,15 +93,27 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Correction",
         roles: ["supply", "ops"],
       },
-      { href: "/utilization", label: "Utilization", roles: "all" },
+      {
+        href: "/utilization",
+        label: "Utilization",
+        roles: ["commander", "supply", "ops"],
+      },
     ],
   },
   {
     id: "earth",
     label: "Earth",
     items: [
-      { href: "/earth/order", label: "Order", roles: "all" },
-      { href: "/earth/pipeline", label: "In transit", roles: "all" },
+      {
+        href: "/earth/order",
+        label: "Order",
+        roles: ["commander", "supply", "ops"],
+      },
+      {
+        href: "/earth/pipeline",
+        label: "In transit",
+        roles: ["commander", "supply", "ops"],
+      },
     ],
   },
 ];

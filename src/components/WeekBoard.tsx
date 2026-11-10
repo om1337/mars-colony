@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ForageWeek } from "@/components/ForageWeek";
+import { useInventory } from "@/context/InventoryContext";
 import {
   CLASS_LABELS,
   COMMITMENTS,
@@ -11,6 +13,7 @@ import {
   RESOURCES,
   WEEK_LABEL,
 } from "@/lib/data";
+import { materialsForMission, materialsOnDay } from "@/lib/finds";
 import type { ResourceClass } from "@/lib/types";
 import {
   buildBlockSegments,
@@ -29,9 +32,19 @@ const CLASS_FILTERS: Array<"all" | ResourceClass> = [
 const colSpan = (start: number, end: number): number => end - start + 1;
 
 export const WeekBoard = () => {
+  const { gearOnHand } = useInventory();
   const [classFilter, setClassFilter] = useState<"all" | ResourceClass>("all");
   const [missionFilter, setMissionFilter] = useState<string>("all");
   const [onlyMine, setOnlyMine] = useState(false);
+
+  const gear = useMemo(
+    () =>
+      RESOURCES.map((item) => ({
+        ...item,
+        onHand: gearOnHand[item.id] ?? item.onHand,
+      })),
+    [gearOnHand],
+  );
 
   const myMissionIds = useMemo(
     () =>
@@ -41,8 +54,8 @@ export const WeekBoard = () => {
     [],
   );
 
-  const visibleResources = useMemo(() => {
-    return RESOURCES.filter((r) => {
+  const visibleGear = useMemo(() => {
+    return gear.filter((r) => {
       if (classFilter !== "all" && r.class !== classFilter) return false;
       if (missionFilter === "all" && !onlyMine) return true;
       const related = COMMITMENTS.filter((c) => c.resourceId === r.id);
@@ -54,7 +67,7 @@ export const WeekBoard = () => {
       }
       return true;
     });
-  }, [classFilter, missionFilter, onlyMine, myMissionIds]);
+  }, [gear, classFilter, missionFilter, onlyMine, myMissionIds]);
 
   const handleClassFilter = (value: "all" | ResourceClass) => {
     setClassFilter(value);
@@ -91,7 +104,7 @@ export const WeekBoard = () => {
                 Week Board
               </h1>
               <p className="mt-1.5 font-body text-sm text-dust-300 md:text-base">
-                {WEEK_LABEL} — every commitment, every collision, one view.
+                {WEEK_LABEL} — resources being foraged, and the gear held to get them.
               </p>
             </div>
             <div className="flex items-center gap-3 font-mono text-[11px] text-dust-400">
@@ -113,7 +126,7 @@ export const WeekBoard = () => {
             <div
               className="flex flex-wrap gap-1 rounded-md border border-dust-700 bg-dust-900/80 p-1"
               role="group"
-              aria-label="Filter by resource class"
+              aria-label="Filter by gear class"
             >
               {CLASS_FILTERS.map((key) => {
                 const active = classFilter === key;
@@ -155,6 +168,9 @@ export const WeekBoard = () => {
                 {MISSIONS.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.name}
+                    {materialsForMission(m.id).length
+                      ? ` · ${materialsForMission(m.id).join(", ")}`
+                      : ""}
                   </option>
                 ))}
               </select>
@@ -185,30 +201,46 @@ export const WeekBoard = () => {
       </header>
 
       <div className="flex-1 overflow-x-auto px-4 py-6 md:px-8">
+        <ForageWeek />
+        <h2 className="mb-3 font-display text-lg text-dust-50">Gear in use</h2>
         <div className="min-w-[900px] animate-fade-up rounded-lg border border-dust-700/90 bg-dust-900/60 shadow-panel">
           <div
             className="grid border-b border-dust-700"
             style={{ gridTemplateColumns: "200px repeat(7, 1fr)" }}
           >
             <div className="flex items-end px-4 pb-3 pt-4 font-mono text-[10px] uppercase tracking-widest text-dust-500">
-              Resource
+              Gear
             </div>
-            {DAYS.map((d) => (
-              <div
-                key={d.index}
-                className="border-l border-dust-700/70 px-2 pb-3 pt-4 text-center"
-              >
-                <div className="font-mono text-[10px] uppercase tracking-widest text-dust-500">
-                  {d.short}
+            {DAYS.map((d) => {
+              const sought = materialsOnDay(d.index);
+              return (
+                <div
+                  key={d.index}
+                  className="border-l border-dust-700/70 px-2 pb-3 pt-4 text-center"
+                >
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-dust-500">
+                    {d.short}
+                  </div>
+                  <div className="font-display text-lg font-medium text-dust-100">
+                    {d.date}
+                  </div>
+                  <div className="mt-1 space-y-0.5">
+                    {sought.map((name) => (
+                      <div
+                        key={name}
+                        className="truncate font-mono text-[9px] text-copper-light"
+                        title={name}
+                      >
+                        {name}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="font-display text-lg font-medium text-dust-100">
-                  {d.date}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {visibleResources.map((resource) => {
+          {visibleGear.map((resource) => {
             const rowCommitments = COMMITMENTS.filter(
               (c) => c.resourceId === resource.id,
             ).filter((c) => {
@@ -384,10 +416,12 @@ export const WeekBoard = () => {
                             title={`${c0.missionName} · ${c0.commander}${c0.amount ? ` · ${c0.amount}` : ""}`}
                           >
                             <div className="truncate font-display text-[11px] font-medium text-white">
-                              {c0.missionName}
+                              {materialsForMission(c0.missionId)[0] ?? c0.missionName}
                             </div>
                             <div className="truncate font-body text-[10px] text-white/75">
-                              {c0.commander}
+                              {materialsForMission(c0.missionId)[0]
+                                ? c0.missionName
+                                : c0.commander}
                               {c0.amount != null
                                 ? ` · ${c0.amount}${resource.unit}`
                                 : ""}
@@ -402,16 +436,16 @@ export const WeekBoard = () => {
             );
           })}
 
-          {visibleResources.length === 0 ? (
+          {visibleGear.length === 0 ? (
             <div className="px-6 py-16 text-center font-body text-sm text-dust-400">
-              No resources match these filters.
+              No gear matches these filters.
             </div>
           ) : null}
         </div>
 
         <p className="mt-4 max-w-2xl font-body text-xs text-dust-500">
-          Looking is free. Claiming happens in Mission Draft. Overlapping holds
-          render as a single red collision the moment they exist.
+          The top band is resources the missions are out to find. The grid is the
+          gear they hold to do it. Overlapping gear renders as one red collision.
         </p>
       </div>
     </section>
