@@ -11,7 +11,7 @@ const MOVES = [
   },
   {
     id: "split",
-    title: "Split the resource",
+    title: "Split the gear",
     detail: "Keep Mon for Ridge Survey; Aquifer Probe takes Wed–Thu only",
   },
   {

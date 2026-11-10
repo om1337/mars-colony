@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { useInventory } from "@/context/InventoryContext";
 import {
   COMMITMENTS,
   DAYS,
@@ -10,6 +11,7 @@ import {
   RESOURCES,
   WEEK_LABEL,
 } from "@/lib/data";
+import { materialsForMission } from "@/lib/finds";
 import {
   buildBlockSegments,
   consumableAvailable,
@@ -18,8 +20,10 @@ import {
 
 const ResourceDetailPage = () => {
   const params = useParams();
+  const { gearOnHand } = useInventory();
   const id = String(params.id ?? "");
-  const resource = RESOURCES.find((r) => r.id === id) ?? RESOURCES[0];
+  const base = RESOURCES.find((r) => r.id === id) ?? RESOURCES[0];
+  const resource = { ...base, onHand: gearOnHand[base.id] ?? base.onHand };
   const commitments = COMMITMENTS.filter((c) => c.resourceId === resource.id);
   const segments = buildBlockSegments(commitments);
   const committed = consumableCommitted(resource, commitments);
@@ -57,14 +61,14 @@ const ResourceDetailPage = () => {
       </Link>
       <header className="mt-4 max-w-3xl animate-fade-up">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-copper-light">
-          Shared · {resource.class} · {WEEK_LABEL}
+          Gear · {resource.class} · {WEEK_LABEL}
         </p>
         <h1 className="mt-2 font-display text-4xl font-semibold text-dust-50">
           {resource.name}
         </h1>
         <p className="mt-2 text-dust-300">
-          Answer availability for a window without asking Maya. Idle history is
-          here from day one.
+          Is this gear free in the window, and which resource were those missions
+          out to find. Idle history stays on the gear.
         </p>
       </header>
 
@@ -122,6 +126,9 @@ const ResourceDetailPage = () => {
                   }}
                 >
                   {c.missionName}
+                  {materialsForMission(c.missionId)[0]
+                    ? ` · ${materialsForMission(c.missionId)[0]}`
+                    : ""}
                 </div>
               );
             })}
@@ -135,12 +142,23 @@ const ResourceDetailPage = () => {
           <ul className="mt-3 space-y-2 text-sm text-dust-300">
             <li>Last 30 sols · used 62h · idle 38%</li>
             <li>Last reconciliation · Sol 186 · Maya Solis</li>
-            <li>Past missions · Ridge Survey, Pipe Repair, Night EVA</li>
+            <li>
+              Past missions ·{" "}
+              {commitments
+                .filter((item) => item.kind === "hold")
+                .map((item) => {
+                  const material = materialsForMission(item.missionId)[0];
+                  return material
+                    ? `${item.missionName} (${material})`
+                    : item.missionName;
+                })
+                .join(", ") || "none this week"}
+            </li>
           </ul>
         </div>
         <div>
           <h2 className="font-display text-lg text-dust-100">
-            Thread · on this resource
+            Thread · on this gear
           </h2>
           <ul className="mt-3 space-y-3">
             {thread.map((t, i) => (

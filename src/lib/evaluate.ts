@@ -56,7 +56,7 @@ export const evaluateClaim = (
   const allowance = rules.find(
     (rule) => rule.kind === "draw_allowance" && rule.resourceId === resourceId,
   );
-  if (allowance && amount !== undefined && amount > allowance.value && verdict !== "red") {
+  if (allowance && amount !== undefined && amount > allowance.value) {
     verdict = "amber";
     ruleId = allowance.id;
     reason = `Draw ${amount} ${resource.unit} exceeds the ${allowance.value} ${allowance.unit ?? resource.unit} allowance`;
