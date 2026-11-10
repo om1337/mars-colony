@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono, Sora } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
+import { PolicyProvider } from "@/context/PolicyContext";
 import { RoleProvider } from "@/context/RoleContext";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     >
       <body className="font-body antialiased">
         <RoleProvider>
-          <AppShell>{children}</AppShell>
+          <PolicyProvider>
+            <AppShell>{children}</AppShell>
+          </PolicyProvider>
         </RoleProvider>
       </body>
     </html>

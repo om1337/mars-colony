@@ -25,50 +25,88 @@ export type NavItem = {
   roles: RoleId[] | "all";
 };
 
-export const NAV: NavItem[] = [
-  { href: "/", label: "Week Board", roles: "all" },
-  { href: "/resource/rover-a", label: "Resource Detail", roles: "all" },
-  { href: "/my-day", label: "My Day", roles: "all" },
-  { href: "/mission/draft", label: "Mission Draft", roles: ["commander"] },
+export type NavGroup = {
+  id: string;
+  label: string;
+  items: NavItem[];
+};
+
+export const NAV_GROUPS: NavGroup[] = [
   {
-    href: "/mission/conflict",
-    label: "Conflict Resolution",
-    roles: ["commander"],
-  },
-  { href: "/mission/blocked", label: "Blocked by Policy", roles: "all" },
-  {
-    href: "/exception/request",
-    label: "Exception Request",
-    roles: ["commander", "supply"],
-  },
-  { href: "/policy", label: "Policy Editor", roles: "all" },
-  {
-    href: "/exception/queue",
-    label: "Exception Queue",
-    roles: ["ops", "commander", "supply"],
-  },
-  { href: "/decisions", label: "Decision Log", roles: "all" },
-  {
-    href: "/checkout",
-    label: "Storeroom Checkout",
-    roles: ["crew", "commander", "supply"],
-  },
-  { href: "/live-burn", label: "Live Burn", roles: "all" },
-  { href: "/reconcile", label: "Return Reconciliation", roles: "all" },
-  {
-    href: "/supply/exceptions",
-    label: "Supply Exceptions",
-    roles: ["supply", "ops"],
+    id: "today",
+    label: "Today",
+    items: [
+      { href: "/", label: "Week board", roles: "all" },
+      { href: "/my-day", label: "My day", roles: "all" },
+      { href: "/resource/rover-a", label: "Resource", roles: "all" },
+      { href: "/live-burn", label: "Live burn", roles: "all" },
+    ],
   },
   {
-    href: "/supply/correction",
-    label: "Ledger Correction",
-    roles: ["supply", "ops"],
+    id: "missions",
+    label: "Missions",
+    items: [
+      { href: "/mission/draft", label: "Draft", roles: ["commander"] },
+      { href: "/mission/conflict", label: "Conflict", roles: ["commander"] },
+      { href: "/mission/blocked", label: "Blocked", roles: "all" },
+    ],
   },
-  { href: "/utilization", label: "Utilization & Denied", roles: "all" },
-  { href: "/earth/order", label: "Earth Order Builder", roles: "all" },
-  { href: "/earth/pipeline", label: "In-Transit Pipeline", roles: "all" },
+  {
+    id: "policy",
+    label: "Policy",
+    items: [
+      { href: "/policy", label: "Editor", roles: "all" },
+      {
+        href: "/exception/request",
+        label: "Request",
+        roles: ["commander", "supply"],
+      },
+      {
+        href: "/exception/queue",
+        label: "Queue",
+        roles: ["ops", "commander", "supply"],
+      },
+      { href: "/decisions", label: "Decisions", roles: "all" },
+    ],
+  },
+  {
+    id: "storeroom",
+    label: "Storeroom",
+    items: [
+      {
+        href: "/checkout",
+        label: "Checkout",
+        roles: ["crew", "commander", "supply"],
+      },
+      { href: "/reconcile", label: "Return", roles: "all" },
+      {
+        href: "/supply/exceptions",
+        label: "Exceptions",
+        roles: ["supply", "ops"],
+      },
+      {
+        href: "/supply/correction",
+        label: "Correction",
+        roles: ["supply", "ops"],
+      },
+      { href: "/utilization", label: "Utilization", roles: "all" },
+    ],
+  },
+  {
+    id: "earth",
+    label: "Earth",
+    items: [
+      { href: "/earth/order", label: "Order", roles: "all" },
+      { href: "/earth/pipeline", label: "In transit", roles: "all" },
+    ],
+  },
 ];
 
 export const canSeeNav = (item: NavItem, role: RoleId): boolean =>
   item.roles === "all" || item.roles.includes(role);
+
+export const visibleNav = (role: RoleId): NavGroup[] =>
+  NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => canSeeNav(item, role)),
+  })).filter((group) => group.items.length > 0);

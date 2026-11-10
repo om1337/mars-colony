@@ -4,6 +4,35 @@ export type PolicyKind =
   | "duration_cap"
   | "draw_rights";
 
+export const POLICY_KIND_LABEL: Record<PolicyKind, string> = {
+  reserve_floor: "Reserve floor",
+  draw_allowance: "Draw allowance",
+  duration_cap: "Duration cap",
+  draw_rights: "Draw rights",
+};
+
+export const statementFor = (
+  kind: PolicyKind,
+  gearName: string,
+  value: number,
+  unit?: string,
+): string => {
+  if (kind === "reserve_floor") {
+    if (unit === "%") return `${gearName} never below ${value}% of capacity.`;
+    return `${gearName} reserve floor is ${value} ${unit ?? ""}.`.trim();
+  }
+  if (kind === "duration_cap") {
+    return `${gearName} held at most ${value} consecutive days per mission.`;
+  }
+  if (kind === "draw_allowance") {
+    return `Any crew on an assigned mission may take ${value} ${unit ?? ""} of ${gearName}.`.replace(
+      "  ",
+      " ",
+    );
+  }
+  return `${gearName} may only be drawn by crew listed on a confirmed mission.`;
+};
+
 export type PolicyRule = {
   id: string;
   kind: PolicyKind;

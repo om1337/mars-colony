@@ -30,6 +30,8 @@ export type Mission = {
   dayStart: number;
   dayEnd: number;
   status: "draft" | "confirmed" | "active" | "closed";
+  /** Materials this mission is out to recover. Gear is what it takes to get them. */
+  findIds: string[];
 };
 
 export type DayLabel = {

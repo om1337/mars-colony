@@ -24,11 +24,11 @@ export const RESOURCES: Resource[] = [
 ];
 
 export const MISSIONS: Mission[] = [
-  { id: "m-ridge", name: "Ridge Survey", commander: "Victor Chen", crew: ["Victor Chen", "Claire Okonkwo", "Sam Ruiz"], dayStart: 0, dayEnd: 2, status: "confirmed" },
-  { id: "m-crater", name: "Crater Sample", commander: "Asha Patel", crew: ["Asha Patel", "Jon Park", "Mei Lin"], dayStart: 2, dayEnd: 4, status: "confirmed" },
-  { id: "m-pipe", name: "Pipe Repair EVA", commander: "Victor Chen", crew: ["Victor Chen", "Claire Okonkwo"], dayStart: 4, dayEnd: 5, status: "confirmed" },
-  { id: "m-drill", name: "Aquifer Probe", commander: "Diego Mora", crew: ["Diego Mora", "Yuki Tanaka"], dayStart: 1, dayEnd: 3, status: "confirmed" },
-  { id: "m-standby", name: "Standby EVA", commander: "Asha Patel", crew: ["Asha Patel"], dayStart: 5, dayEnd: 6, status: "confirmed" },
+  { id: "m-ridge", name: "Ridge Survey", commander: "Victor Chen", crew: ["Victor Chen", "Claire Okonkwo", "Sam Ruiz"], dayStart: 0, dayEnd: 2, status: "confirmed", findIds: ["water-ice"] },
+  { id: "m-crater", name: "Crater Sample", commander: "Asha Patel", crew: ["Asha Patel", "Jon Park", "Mei Lin"], dayStart: 2, dayEnd: 4, status: "confirmed", findIds: ["hematite"] },
+  { id: "m-pipe", name: "Pipe Repair EVA", commander: "Victor Chen", crew: ["Victor Chen", "Claire Okonkwo"], dayStart: 4, dayEnd: 5, status: "confirmed", findIds: ["scrap-alloy"] },
+  { id: "m-drill", name: "Aquifer Probe", commander: "Diego Mora", crew: ["Diego Mora", "Yuki Tanaka"], dayStart: 1, dayEnd: 3, status: "confirmed", findIds: ["subsurface-ice"] },
+  { id: "m-standby", name: "Standby EVA", commander: "Asha Patel", crew: ["Asha Patel"], dayStart: 5, dayEnd: 6, status: "confirmed", findIds: ["regolith"] },
 ];
 
 export const CURRENT_CREW = "Claire Okonkwo";
